@@ -8,6 +8,7 @@
         "php": "^8.0.2",
         "bepsvpt/blurhash": "^3.0",
         "beyondcode/laravel-websockets": "^1.14",
+        "doctrine/dbal": "^4.0",
         "guzzlehttp/guzzle": "^7.2",
         "intervention/image": "^3.6",
         "laravel/framework": "^9.19",

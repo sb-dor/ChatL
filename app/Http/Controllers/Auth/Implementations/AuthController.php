@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\Interfaces\AuthInterface;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Traits\ResponsesTrait;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\ResponseTrait;
 use Illuminate\Support\Facades\Hash;
@@ -26,30 +27,39 @@ class AuthController extends Controller implements AuthInterface
 
     public function register(Request $request)
     {
-        $user = User::where('email', $request->get('email'))->first();
+        try {
+            $user = User::where('email', $request->get('email'))->first();
 
-        if ($user) return $this->fail([
-            'message' => "There is a user which is already exists with this email!"
-        ]);
+            if ($user) {
+                return $this->fail([
+                    'message' => "There is a user which is already exists with this email!"
+                ]);
+            }
 
-        $user = User::where('user_name', $request->get('user_name'))->first();
+            $user = User::where('user_name', $request->get('user_name'))->first();
 
-        if ($user) return $this->fail([
-            'message' => "There is a user which is already exists with this user name!"
-        ]);
+            if ($user) {
+                return $this->fail([
+                    'message' => "There is a user which is already exists with this user name!"
+                ]);
+            }
 
-        $user = User::create([
-            'user_name' => $request->get('user_name'),
-            'email' => $request->get('email'),
-            'password' => Hash::make($request->get('password')),
-        ]);
+            $user = User::create([
+                'user_name' => $request->get('user_name'),
+                'email' => $request->get('email'),
+                'password' => Hash::make($request->get('password')),
+                'created_at' => date("Y-m-d H:i:s")
+            ]);
 
-        $token = $user->createToken('user_token')->plainTextToken;
+            $token = $user->createToken('user_token')->plainTextToken;
 
-        return $this->success([
-            'user' => $user,
-            'token' => $token,
-        ]);
+            return $this->success([
+                'user' => $user,
+                'token' => $token,
+            ]);
+        } catch (Exception $e) {
+            return $this->fail(['message' => $e->getMessage()]);
+        }
     }
 
     public function login(Request $request)
