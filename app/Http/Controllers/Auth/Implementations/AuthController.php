@@ -97,17 +97,18 @@ class AuthController extends Controller implements AuthInterface
             $checkUser = User::where('email', $request->get('email'))->first();
 
             if (!$checkUser) {
-                $checkUser = User::where('email', $checkUser->email)->update([
-                    'google_id' => $request->get("google_id")
-                ]);
-            } else {
                 $checkUser = User::create([
                     'email' => $request->get('email'),
                     'google_id' => $request->get("google_id"),
                 ]);
+            } else {
+                User::where('email', $request->get('email'))->update([
+                    'google_id' => $request->get("google_id")
+                ]);
             }
 
             $token = $checkUser->createToken('user_token')->plainTextToken;
+
 
             return $this->success([
                 'user' => $checkUser,
