@@ -83,17 +83,38 @@ class AuthController extends Controller implements AuthInterface
             ]);
         }
 
-        $user = User::create([
-            'user_name' => $request->get('user_name'),
-            'email' => $request->get('email'),
-            'password' => Hash::make($request->get('password')),
-        ]);
-
         $token = $user->createToken('user_token')->plainTextToken;
 
         return $this->success([
             'user' => $user,
             'token' => $token,
         ]);
+    }
+
+    public function google_auth(Request $request)
+    {
+        try {
+            $checkUser = User::where('email', $request->get('email'))->first();
+
+            if (!$checkUser) {
+                $checkUser = User::where('email', $checkUser->email)->update([
+                    'google_id' => $request->get("google_id")
+                ]);
+            } else {
+                $checkUser = User::create([
+                    'email' => $request->get('email'),
+                    'google_id' => $request->get("google_id"),
+                ]);
+            }
+
+            $token = $checkUser->createToken('user_token')->plainTextToken;
+
+            return $this->success([
+                'user' => $checkUser,
+                'token' => $token,
+            ]);
+        } catch (Exception $e) {
+            return $this->fail(['message' => $e->getMessage()]);
+        }
     }
 }

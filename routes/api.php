@@ -22,4 +22,6 @@ Route::prefix('/auth')->group(function () {
     Route::post('/register', [AuthDI::class, 'register']);
 
     Route::post('/login', [AuthDI::class, 'login']);
+
+    Route::post('/google-auth', [AuthDI::class, 'google_auth']);
 });

@@ -29,4 +29,9 @@ class AuthDI
     {
         return $this->auth->login($request);
     }
+
+    public function google_auth(Request $request)
+    {
+        return $this->auth->google_auth($request);
+    }
 }
