@@ -18,9 +18,11 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('email')->unique();
             $table->string('google_id')->unique()->nullable();
+            $table->string('facebook_id')->unique()->nullable();
             $table->string('verification_code', 6)->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
+            $table->string('image_url')->nullable();
             $table->rememberToken();
             $table->dateTime('created_at')->nullable();
             $table->dateTime('updated_at')->nullable();
