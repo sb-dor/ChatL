@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth\Implementations;
 
 use App\Http\Controllers\Auth\Interfaces\AuthInterface;
-use App\Http\Controllers\Auth\Interfaces\OtherAuthInterface;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Traits\ResponsesTrait;

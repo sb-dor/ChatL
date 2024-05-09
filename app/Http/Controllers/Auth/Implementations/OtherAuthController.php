@@ -43,5 +43,32 @@ class OtherAuthController extends Controller implements OtherAuthInterface
 
     public function facebook_auth(Request $request)
     {
+        try {
+            $checkUser = User::where('email', $request->get('email'))->first();
+
+            if (!$checkUser) {
+                $checkUser = User::create([
+                    'email' => $request->get('email'),
+                    'name' => $request->get('name'),
+                    'image_url' => $request->get('image_url'),
+                    'facebook_id' => $request->get("facebook_id"),
+                ]);
+            } else {
+                User::where('email', $request->get('email'))->update([
+                    'image_url' => $request->get('image_url') ? $request->get('image_url') : $checkUser->image_url,
+                    'facebook_id' => $request->get("facebook_id"),
+                ]);
+            }
+
+            $token = $checkUser->createToken('user_token')->plainTextToken;
+
+
+            return $this->success([
+                'user' => $checkUser,
+                'token' => $token,
+            ]);
+        } catch (Exception $e) {
+            return $this->fail(['message' => $e->getMessage()]);
+        }
     }
 }

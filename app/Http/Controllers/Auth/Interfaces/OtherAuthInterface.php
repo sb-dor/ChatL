@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth\Interfaces;
+
 use Illuminate\Http\Request;
 
 interface OtherAuthInterface
