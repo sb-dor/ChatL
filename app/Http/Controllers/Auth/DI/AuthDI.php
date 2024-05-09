@@ -3,16 +3,20 @@
 namespace App\Http\Controllers\Auth\DI;
 
 use App\Http\Controllers\Auth\Implementations\AuthController;
+use App\Http\Controllers\Auth\Implementations\OtherAuthController;
 use App\Http\Controllers\Auth\Interfaces\AuthInterface;
+use App\Http\Controllers\Auth\Interfaces\OtherAuthInterface;
 use Illuminate\Http\Request;
 
 class AuthDI
 {
     private AuthInterface $auth;
+    private OtherAuthInterface $otherAuthInterface;
 
     public function __construct()
     {
         $this->auth = new AuthController();
+        $this->otherAuthInterface = new OtherAuthController();
     }
 
     public function check_auth(Request $request)
@@ -32,6 +36,11 @@ class AuthDI
 
     public function google_auth(Request $request)
     {
-        return $this->auth->google_auth($request);
+        return $this->otherAuthInterface->google_auth($request);
+    }
+
+    public function facebook_auth(Request $request)
+    {
+        return $this->otherAuthInterface->facebook_auth($request);
     }
 }

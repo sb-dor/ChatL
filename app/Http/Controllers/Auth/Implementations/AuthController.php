@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth\Implementations;
 
 use App\Http\Controllers\Auth\Interfaces\AuthInterface;
+use App\Http\Controllers\Auth\Interfaces\OtherAuthInterface;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Traits\ResponsesTrait;
@@ -89,33 +90,5 @@ class AuthController extends Controller implements AuthInterface
             'user' => $user,
             'token' => $token,
         ]);
-    }
-
-    public function google_auth(Request $request)
-    {
-        try {
-            $checkUser = User::where('email', $request->get('email'))->first();
-
-            if (!$checkUser) {
-                $checkUser = User::create([
-                    'email' => $request->get('email'),
-                    'google_id' => $request->get("google_id"),
-                ]);
-            } else {
-                User::where('email', $request->get('email'))->update([
-                    'google_id' => $request->get("google_id")
-                ]);
-            }
-
-            $token = $checkUser->createToken('user_token')->plainTextToken;
-
-
-            return $this->success([
-                'user' => $checkUser,
-                'token' => $token,
-            ]);
-        } catch (Exception $e) {
-            return $this->fail(['message' => $e->getMessage()]);
-        }
     }
 }
