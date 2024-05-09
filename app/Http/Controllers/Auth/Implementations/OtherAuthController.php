@@ -22,10 +22,12 @@ class OtherAuthController extends Controller implements OtherAuthInterface
                 $checkUser = User::create([
                     'email' => $request->get('email'),
                     'google_id' => $request->get("google_id"),
+                    'image_url' => $request->get('image_url'),
                 ]);
             } else {
                 User::where('email', $request->get('email'))->update([
-                    'google_id' => $request->get("google_id")
+                    'google_id' => $request->get("google_id"),
+                    'image_url' => $request->get('image_url') ? $request->get('image_url') : $checkUser->image_url,
                 ]);
             }
 

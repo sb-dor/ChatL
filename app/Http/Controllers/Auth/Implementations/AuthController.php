@@ -68,7 +68,10 @@ class AuthController extends Controller implements AuthInterface
             ::where(function ($sql) use ($request) {
                 $sql->where('email', $request->get('email_or_username'))
                     ->orWhere('user_name', $request->get('email_or_username'));
-            })->first();
+            })
+            ->whereNull('google_id')
+            ->whereNull('facebook_id')
+            ->first();
 
         if (!$user) {
             return $this->fail([
