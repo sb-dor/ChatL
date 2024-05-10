@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\DI\AuthDI;
+use App\Http\Controllers\ContactsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,4 +27,15 @@ Route::prefix('/auth')->group(function () {
     Route::post('/google-auth', [AuthDI::class, 'google_auth']);
 
     Route::post('/facebook-auth', [AuthDI::class, 'facebook_auth']);
+});
+
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::prefix('/contacts')->group(function () {
+
+        Route::get('/search', [ContactsController::class, 'search_contacts']);
+
+        Route::put('/add-contact', [ContactsController::class, 'add_contact']);
+    });
 });
