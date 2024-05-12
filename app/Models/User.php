@@ -44,4 +44,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    public function user_contact()
+    {
+        return $this->hasOne(UserContact::class, 'contact_id', 'id');
+    }
 }
