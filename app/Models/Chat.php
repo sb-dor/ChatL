@@ -18,4 +18,9 @@ class Chat extends Model
     {
         return $this->hasOne(ChatMessage::class, 'chat_id', 'id')->latest('created_at');
     }
+
+    public function participants()
+    {
+        return $this->hasMany(ChatParticipant::class, 'chat_id', "id");
+    }
 }

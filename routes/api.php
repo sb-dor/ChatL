@@ -48,6 +48,8 @@ Route::middleware('auth:sanctum')->group(function () {
         
         Route::get('/get/chats', [ChatController::class, 'get_all_users_chat']);
 
+        Route::get('/get/chat/on/entrance', [ChatController::class, 'get_user_chat_on_entrance']);
+
     });
 });
 
