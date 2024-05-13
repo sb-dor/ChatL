@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\DI\AuthDI;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactsController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+// AUTH ROUTES
 Route::prefix('/auth')->group(function () {
 
     Route::get('/check-auth', [AuthDI::class, 'check_auth']);
@@ -32,10 +34,23 @@ Route::prefix('/auth')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
 
+    // CONTACTS ROUTES
     Route::prefix('/contacts')->group(function () {
 
         Route::get('/search', [ContactsController::class, 'search_contacts']);
 
         Route::put('/add-contact', [ContactsController::class, 'add_contact']);
     });
+
+
+    // CHATS ROUTES
+    Route::prefix('/chats')->group(function () {
+        
+        Route::get('/get/chats', [ChatController::class, 'get_all_users_chat']);
+
+    });
 });
+
+
+// test_for
+Route::get('/test_message', [ChatController::class, 'test_message']);
