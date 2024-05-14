@@ -9,6 +9,8 @@ class ChatParticipant extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'chat_participants';
 
     protected $guarded = ['id'];

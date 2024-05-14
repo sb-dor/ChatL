@@ -9,6 +9,8 @@ class UserContact extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'user_contacts';
 
     protected $guarded = ['id'];

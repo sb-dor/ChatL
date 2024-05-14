@@ -9,6 +9,8 @@ class ChatMessage extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'chat_messages';
 
     protected $guarded = ['id'];
