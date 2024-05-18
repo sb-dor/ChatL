@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\ChatNotifyEvent;
 use App\Models\Chat;
+use App\Models\ChatMessage;
 use App\Models\ChatParticipant;
 use App\Models\User;
 use App\Traits\ResponsesTrait;
@@ -44,7 +45,7 @@ class ChatController extends Controller
 
             if (!$findChat) {
 
-                // $this->find_and_delete_users_temporary_created_chat($user_ids);
+                $this->find_and_delete_users_temporary_created_chat($user_ids);
 
                 $time = date('Y-m-d H:i:s');
 
@@ -73,6 +74,21 @@ class ChatController extends Controller
         }
     }
 
+
+    public function message_handler(Request $request)
+    {
+
+        $message = ChatMessage::create([
+            "chat_id" => $request->get("chat_id"),
+            "user_id" => $request->get("user_id"),
+            "related_to_user_id" => $request->get("related_to_user_id"),
+            "chat_message_uuid" => $request->get('"chat_message_uuid'),
+            "message" => $request->get("message"),
+            "created_at" => $request->get("created_at"),
+        ]);
+
+    }
+
     public function delete_temp_created_chats(Request $request)
     {
         Chat::where('id', $request->get('chat_id'))
@@ -83,6 +99,7 @@ class ChatController extends Controller
         return $this->success(['chat_id' => $request->get('chat_id'), "chat_uuid" => $request->get('chat_uuid')]);
     }
 
+    // it's necessary, when user turned off the app without going back and the chat which was created temporary wasn't deleted
     private function find_and_delete_users_temporary_created_chat($user_ids = [])
     {
 
@@ -92,14 +109,17 @@ class ChatController extends Controller
                     if ($i == 0) {
                         $sql->where('chat_participants.user_id', $user_ids[$i]);
                     } else {
-                        $sql->where('chat_participants.user_id', $user_ids[$i]);
+                        $sql->orWhere('chat_participants.user_id', $user_ids[$i]);
                     }
                 }
             })
+            ->whereNotNull("chats.temporary_chat")
             ->groupBy('chats.id')
             ->select('chats.id')
             ->pluck('chats.id')
             ->toArray();
+
+        ChatParticipant::whereIn('chat_id', $usersChatsIds)->delete();
 
         Chat::where('id', $usersChatsIds)->delete();
     }
@@ -107,22 +127,24 @@ class ChatController extends Controller
 
     public function test_message()
     {
-        // $chat = new Chat();
-        // $channel_name = "chat_notify_of_user_2";
-
-        // event(new ChatNotifyEvent($channel_name, $chat));
-
-        // $ids = [1, 2];
-
-        // $usersChat = Chat::leftJoin('chat_participants', 'chats.id', 'chat_participants.chat_id')
-        //     ->where(function ($sql) use ($ids) {
-
+        // $user_ids = [1, 2];
+        // // $chat = new Chat();
+        // $usersChatsIds = Chat::leftJoin('chat_participants', 'chats.id', 'chat_participants.chat_id')
+        //     ->where(function ($sql) use ($user_ids) {
+        //         for ($i = 0; $i < count($user_ids); $i++) {
+        //             if ($i == 0) {
+        //                 $sql->where('chat_participants.user_id', $user_ids[$i]);
+        //             } else {
+        //                 $sql->orWhere('chat_participants.user_id', $user_ids[$i]);
+        //             }
+        //         }
         //     })
+        //     ->whereNotNull("chats.temporary_chat")
         //     ->groupBy('chats.id')
         //     ->select('chats.id')
         //     ->pluck('chats.id')
         //     ->toArray();
 
-        // return $usersChat;
+        // return response()->json(['data' => $usersChatsIds]);
     }
 }
