@@ -17,8 +17,9 @@ class ChatMessageEvent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
 
-    
+
     private ChatMessage $message;
+    private $CHANNEL_NAME;
 
 
     /**
@@ -26,9 +27,10 @@ class ChatMessageEvent implements ShouldBroadcastNow
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($message, $chat_uuid)
     {
-        //
+        $this->message = $message;
+        $this->CHANNEL_NAME = CHAT_CHANNEL_ID . "{$message->chat_id}" . CHAT_CHANNEL_UUID . "{$chat_uuid}";
     }
 
     /**
@@ -38,6 +40,18 @@ class ChatMessageEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('channel-name');
+        return ["{$this->CHANNEL_NAME}"];
+    }
+
+    public function broadcastAs()
+    {
+        return 'chat_messages.event'; //name of event 
+    }
+
+    public function broadcastWith()
+    {
+        return  [
+            'message' =>$this->message,
+        ]; //after working any fun that calling this event will send message reverse
     }
 }
