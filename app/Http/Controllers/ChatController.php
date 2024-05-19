@@ -21,17 +21,24 @@ class ChatController extends Controller
     public function get_all_users_chat(Request $request)
     {
 
-        $user = $request->user();
+        try {
+            $user = $request->user();
 
-        $chats = User
-            ::join('chat_participants', 'chats.id', 'chat_participants.chat_id')
-            ->where('chat_participants.id', $user->id)
-            ->whereNull('temporary_chat')
-            ->select('chats.*')
-            ->with('chat_last_message')
-            ->get();
+            $chats = Chat
+                ::join('chat_participants', 'chats.id', 'chat_participants.chat_id')
+                ->where('chat_participants.user_id', $user->id)
+                ->whereNull('temporary_chat')
+                ->select('chats.*')
+                ->with('chat_last_message')
+                ->with(['participants' => function ($sql) use($user){
+                    $sql->with('user')->where('user_id', '!=', $user->id);
+                }])
+                ->get();
 
-        return $this->success(['chats' => $chats]);
+            return $this->success(['chats' => $chats]);
+        } catch (Exception $e) {
+            return $this->fail(['message' => $e->getMessage()]);
+        }
     }
 
 
@@ -69,7 +76,12 @@ class ChatController extends Controller
                 }
             }
 
-            $findChat = $findChat->load('participants');
+            $findChat = $findChat->load('participants')->load(['messages' => function ($sql) {
+                $sql->with('user', 'related_to_user')
+                    ->whereNull('deleted_at')
+                    ->orderBy('created_at', 'desc')
+                    ->take(15);
+            }]);
 
             return $this->success(['chat' => $findChat]);
         } catch (Exception $e) {
@@ -87,7 +99,7 @@ class ChatController extends Controller
                 "chat_id" => $request->get("chat_id"),
                 "user_id" => $request->get("user_id"),
                 "related_to_user_id" => $request->get("related_to_user_id"),
-                "chat_message_uuid" => $request->get('"chat_message_uuid'),
+                "chat_message_uuid" => $request->get('chat_message_uuid'),
                 "message" => $request->get("message"),
                 "created_at" => $request->get("created_at"),
             ]);

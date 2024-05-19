@@ -14,4 +14,14 @@ class ChatMessage extends Model
     protected $table = 'chat_messages';
 
     protected $guarded = ['id'];
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
+    public function related_to_user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
 }
