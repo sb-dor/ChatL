@@ -93,4 +93,18 @@ class AuthController extends Controller implements AuthInterface
             'token' => $token,
         ]);
     }
+
+
+    public function logout(Request $request)
+    {
+        try {
+
+            $request->user()->currentAccessToken()->delete();
+
+            return $this->success(['success' => true]);
+
+        } catch (Exception $e) {
+            return $this->fail(['message' => $e->getMessage()]);
+        }
+    }
 }

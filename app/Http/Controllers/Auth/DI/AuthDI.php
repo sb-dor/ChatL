@@ -43,4 +43,9 @@ class AuthDI
     {
         return $this->otherAuthInterface->facebook_auth($request);
     }
+
+    public function logout(Request $request)
+    {
+        return $this->auth->logout($request);
+    }
 }

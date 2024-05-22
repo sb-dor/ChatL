@@ -29,6 +29,8 @@ Route::prefix('/auth')->group(function () {
     Route::post('/google-auth', [AuthDI::class, 'google_auth']);
 
     Route::post('/facebook-auth', [AuthDI::class, 'facebook_auth']);
+
+    Route::delete('/logout', [AuthDI::class, 'logout']);
 });
 
 
