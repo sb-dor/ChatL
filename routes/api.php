@@ -30,7 +30,9 @@ Route::prefix('/auth')->group(function () {
 
     Route::post('/facebook-auth', [AuthDI::class, 'facebook_auth']);
 
-    Route::delete('/logout', [AuthDI::class, 'logout']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::delete('/logout', [AuthDI::class, 'logout']);
+    });
 });
 
 

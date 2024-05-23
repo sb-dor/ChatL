@@ -30,7 +30,7 @@ class ChatController extends Controller
                 ->whereNull('temporary_chat')
                 ->select('chats.*')
                 ->with('chat_last_message')
-                ->with(['participants' => function ($sql) use($user){
+                ->with(['participants' => function ($sql) use ($user) {
                     $sql->with('user')->where('user_id', '!=', $user->id);
                 }])
                 ->get();
@@ -152,7 +152,7 @@ class ChatController extends Controller
                 }
             })
 
-            ->groupBy('chats.id')
+            // ->groupBy('chats.id')
             ->select('chats.id');
 
 
@@ -163,6 +163,8 @@ class ChatController extends Controller
                 ->pluck('chats.id')
                 ->toArray();
 
+            if (count($foundIds) < 2) return [];
+
             return $foundIds;
         } else {
 
@@ -170,6 +172,8 @@ class ChatController extends Controller
                 ->whereNull("chats.temporary_chat")
                 ->pluck('chats.id')
                 ->toArray();
+
+            if (count($foundIds) < 2) return null;
 
             $findChat = Chat::where('chat_uuid', $chat_uuid)->first();
 
@@ -201,6 +205,11 @@ class ChatController extends Controller
         //     ->select('chats.id')
         //     ->pluck('chats.id')
         //     ->toArray();
+
+        $res = $this->chat_finder(false, [2, 3]);
+
+
+        return $res;
 
         // return response()->json(['data' => $usersChatsIds]);
     }
