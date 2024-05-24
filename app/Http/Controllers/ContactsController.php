@@ -23,7 +23,9 @@ class ContactsController extends Controller
             }])
             ->where(function ($sql) use ($request) {
                 $sql->where('email', 'like', "%{$request->get('value')}%")
-                    ->orWhere('user_name', 'like', "%{$request->get("value")}%");
+                    ->orWhere(function ($q) use ($request) {
+                        $q->whereNotNull('user_name')->where('user_name', 'like', "%{$request->get("value")}%");
+                    });
             })
             ->where("id", "!=", $current_user->id)
             ->whereNull('deleted_at')
