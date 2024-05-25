@@ -175,11 +175,6 @@ class ChatController extends Controller
             ->havingRaw('COUNT(chat_participants.user_id) = ?', [count($user_ids)])
             ->havingRaw('COUNT(DISTINCT chat_participants.user_id) = ?', [count($user_ids)]);
 
-        // if ($chat_uuid) {
-        //     $foundIds->where('chats.chat_uuid', $chat_uuid);
-        // }
-
-
         if ($get_ids) {
 
             $foundIds = $foundIds
