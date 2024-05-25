@@ -40,7 +40,7 @@ class ChatMessageEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return ["{$this->CHANNEL_NAME}"];
+        return [$this->CHANNEL_NAME];
     }
 
     public function broadcastAs()

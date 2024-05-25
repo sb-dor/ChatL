@@ -25,9 +25,9 @@ class ChatNotifyEvent implements ShouldBroadcastNow
      *
      * @return void
      */
-    public function __construct($channel_name, $chat)
+    public function __construct($chat, $user_id)
     {
-        $this->channel_name = $channel_name;
+        $this->channel_name = CHANNEL_NOTIFY_OF_USER . "{$user_id}";
         $this->chat = $chat;
     }
 
@@ -38,7 +38,7 @@ class ChatNotifyEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return ["{$this->channel_name}"]; //name of channel 
+        return [$this->channel_name]; //name of channel 
     }
 
     public function broadcastAs()

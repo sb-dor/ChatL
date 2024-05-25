@@ -47,7 +47,17 @@ class ChatController extends Controller
         try {
             $current_user = $request->user();
 
-            $user_ids = [$current_user->id, $request->get('with_user_id')];
+            $user_ids = [];
+
+            if ($request->get('chat_uuid')) {
+                $user_ids = ChatParticipant
+                    ::join('chats', 'chat_participants.chat_id', 'chats.id')
+                    ->where('chats.chat_uuid', $request->get('chat_uuid'))
+                    ->pluck('chat_participants.user_id')
+                    ->toArray();
+            } else if ($request->get('with_user_id')) {
+                $user_ids = [$current_user->id, $request->get('with_user_id')];
+            }
 
             // $findChat = Chat::where('chat_uuid', $request->get('chat_uuid'))->first();
 
@@ -109,8 +119,26 @@ class ChatController extends Controller
             }
 
             event(new ChatMessageEvent($message, $chat->chat_uuid));
+            $this->notify_all_users_channels_listener($chat, $request);
         } catch (Exception $e) {
             return $this->fail(['message' => $e->getMessage()]);
+        }
+    }
+
+    private function notify_all_users_channels_listener($chat, $request)
+    {
+        $chat = $chat->load('chat_last_message')->load(['participants' => function ($sql) use ($request) {
+            $sql->with('user');
+        }]);
+
+        $find_all_chat_participants = ChatParticipant
+            ::where('chat_id', $chat->id)
+            ->groupBy('user_id')
+            ->pluck('user_id')
+            ->toArray();
+
+        foreach ($find_all_chat_participants as $user_id) {
+            event(new ChatNotifyEvent($chat, $user_id));
         }
     }
 
@@ -141,19 +169,15 @@ class ChatController extends Controller
 
     private function chat_finder($get_ids, $user_ids = [], $chat_uuid = null)
     {
-        $foundIds = Chat::leftJoin('chat_participants', 'chats.id', 'chat_participants.chat_id')
-            ->where(function ($sql) use ($user_ids) {
-                for ($i = 0; $i < count($user_ids); $i++) {
-                    if ($i == 0) {
-                        $sql->where('chat_participants.user_id', $user_ids[$i]);
-                    } else {
-                        $sql->orWhere('chat_participants.user_id', $user_ids[$i]);
-                    }
-                }
-            })
+        $foundIds = Chat::leftJoin('chat_participants', 'chats.id', '=', 'chat_participants.chat_id')
+            ->whereIn('chat_participants.user_id', $user_ids)
+            ->groupBy('chats.id')
+            ->havingRaw('COUNT(chat_participants.user_id) = ?', [count($user_ids)])
+            ->havingRaw('COUNT(DISTINCT chat_participants.user_id) = ?', [count($user_ids)]);
 
-            // ->groupBy('chats.id')
-            ->select('chats.id');
+        // if ($chat_uuid) {
+        //     $foundIds->where('chats.chat_uuid', $chat_uuid);
+        // }
 
 
         if ($get_ids) {
@@ -172,12 +196,6 @@ class ChatController extends Controller
                 ->whereNull("chats.temporary_chat")
                 ->pluck('chats.id')
                 ->toArray();
-
-            if (count($foundIds) < 2) return null;
-
-            $findChat = Chat::where('chat_uuid', $chat_uuid)->first();
-
-            if ($findChat) return $findChat;
 
             $findChat = Chat::whereIn('id', $foundIds)->first();
 
