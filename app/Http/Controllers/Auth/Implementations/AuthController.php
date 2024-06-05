@@ -82,7 +82,7 @@ class AuthController extends Controller implements AuthInterface
 
         if (!Hash::check($request->get('password'), $user->password)) {
             return $this->fail([
-                'message' => "There is a user which is already exists with this user name!"
+                'message' => "Incorrect password. Please try again"
             ]);
         }
 

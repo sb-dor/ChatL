@@ -30,9 +30,11 @@ class ChatController extends Controller
                 ->whereNull('temporary_chat')
                 ->select('chats.*')
                 ->with('chat_last_message')
-                ->with(['participants' => function ($sql) use ($user) {
-                    $sql->with('user')->where('user_id', '!=', $user->id);
-                }])
+                ->with([
+                    'participants' => function ($sql) use ($user) {
+                        $sql->with('user')->where('user_id', '!=', $user->id);
+                    }
+                ])
                 ->get();
 
             return $this->success(['chats' => $chats]);
@@ -86,12 +88,16 @@ class ChatController extends Controller
                 }
             }
 
-            $findChat = $findChat->load('participants')->load(['messages' => function ($sql) {
-                $sql->with('user', 'related_to_user')
-                    ->whereNull('deleted_at')
-                    ->orderBy('created_at', 'desc')
-                    ->take(15);
-            }]);
+            $findChat = $findChat->load(['participants' => function ($sql) use($current_user) {
+                $sql->with('user')->where('user_id', '!=', $current_user->id);
+            }])->load([
+                'messages' => function ($sql) {
+                    $sql->with('user', 'related_to_user')
+                        ->whereNull('deleted_at')
+                        ->orderBy('created_at', 'desc')
+                        ->take(15);
+                }
+            ]);
 
             return $this->success(['chat' => $findChat]);
         } catch (Exception $e) {
@@ -127,9 +133,11 @@ class ChatController extends Controller
 
     private function notify_all_users_channels_listener($chat, $request)
     {
-        $chat = $chat->load('chat_last_message')->load(['participants' => function ($sql) use ($request) {
-            $sql->with('user');
-        }]);
+        $chat = $chat->load('chat_last_message')->load([
+            'participants' => function ($sql) use ($request) {
+                $sql->with('user');
+            }
+        ]);
 
         $find_all_chat_participants = ChatParticipant
             ::where('chat_id', $chat->id)
@@ -182,7 +190,8 @@ class ChatController extends Controller
                 ->pluck('chats.id')
                 ->toArray();
 
-            if (count($foundIds) < 2) return [];
+            if (count($foundIds) < 2)
+                return [];
 
             return $foundIds;
         } else {
@@ -194,7 +203,8 @@ class ChatController extends Controller
 
             $findChat = Chat::whereIn('id', $foundIds)->first();
 
-            if ($findChat) return $findChat;
+            if ($findChat)
+                return $findChat;
         }
     }
 
