@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\DI\AuthDI;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactsController;
+use App\Http\Controllers\VideoStreamController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,6 +58,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/delete/temp/created/chats', [ChatController::class, 'delete_temp_created_chats']);
 
         Route::post('/message/handler', [ChatController::class, 'message_handler']);
+    });
+
+    // VIDEO CHAT STREAM ROUTES
+    Route::prefix('/chats/video-stream')->group(function () {
+
+        Route::put('/videochat/entrance', [VideoStreamController::class, 'videochat_entrance']);
     });
 });
 
