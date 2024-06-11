@@ -64,6 +64,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('/chats/video-stream')->group(function () {
 
         Route::put('/videochat/entrance', [VideoStreamController::class, 'videochat_entrance']);
+
+        //
+        Route::put('/start/videochat', [VideoStreamController::class, 'start_video_chat']);
     });
 });
 
