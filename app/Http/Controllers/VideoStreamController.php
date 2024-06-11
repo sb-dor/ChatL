@@ -10,4 +10,14 @@ class VideoStreamController extends Controller
     {
         //
     }
+
+    public function leave_video_chat(Request $request)
+    {
+        //
+    }
+
+    public function start_video_chat(Request $request)
+    {
+        //`
+    }
 }
