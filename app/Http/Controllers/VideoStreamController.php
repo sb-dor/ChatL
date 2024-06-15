@@ -92,6 +92,14 @@ class VideoStreamController extends Controller
     }
 
 
+    // remember to change Kernel.php file :
+
+    //  'api' => [
+    //     'throttle:300,1',
+    //     \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    //  ],
+
+    // in order to accept more request per minute
     public function video_stream(Request $request)
     {
         // handle video data to broadcast
