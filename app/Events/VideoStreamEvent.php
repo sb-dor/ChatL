@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Events;
+
+use App\Classes\VideoStreamClass;
+use App\Models\Chat;
 use App\Models\ChatParticipant;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -12,17 +15,20 @@ class VideoStreamEvent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
 
-    protected ChatParticipant $chat_participant;
-    protected $video_stream_data;
+    protected VideoStreamClass $video_stream_class;
     protected $channel_name;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
-    {
-        //
+    public function __construct(
+        ChatParticipant $participant,
+        Chat $chat,
+        $video_stream_data,
+    ) {
+        $this->video_stream_class = new VideoStreamClass($participant, $video_stream_data);
+        $this->channel_name = "video_" . CHAT_CHANNEL_ID . "{$chat->id}" . CHAT_CHANNEL_UUID . "{$chat->chat_uuid}";
     }
 
     /**
@@ -42,7 +48,7 @@ class VideoStreamEvent implements ShouldBroadcastNow
 
     public function broadcastWith()
     {
-        return ['video_steam_data' => $this->video_stream_data];
+        return $this->video_stream_class->responseForPusher();
     }
 
 }

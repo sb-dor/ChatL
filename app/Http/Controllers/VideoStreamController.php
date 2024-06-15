@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\VideoStreamEvent;
 use App\Models\Chat;
 use App\Models\ChatParticipant;
 use App\Traits\ResponsesTrait;
@@ -42,7 +43,7 @@ class VideoStreamController extends Controller
             } else {
                 $find_participant = ChatParticipant::create([
                     'chat_id' => $chat->id,
-                'user_id' => $request->get('user_id'),
+                    'user_id' => $request->get('user_id'),
                     'in_video_stream' => true,
                     'participate_at' => date('Y-m-d H:i:s'),
                 ]);
@@ -94,6 +95,27 @@ class VideoStreamController extends Controller
     public function video_stream(Request $request)
     {
         // handle video data to broadcast
+        $chat_participant = ChatParticipant
+            ::where("user_id", $request->get("user_id"))
+            ->where("chat_id", $request->get("chat_id"))
+            ->with("user", 'chat')
+            ->first();
+
+        $chat = Chat::where("id", $request->get("chat_id"))
+            ->where("chat_uuid", $request->get("chat_uuid")) // for double checking
+            ->first();
+
+        event(
+            new VideoStreamEvent(
+                $chat_participant,
+                $chat,
+                $request->get("image_data")
+            )
+        );
+
+        $channel_name = "video_" . CHAT_CHANNEL_ID . "{$chat->id}" . CHAT_CHANNEL_UUID . "{$chat->chat_uuid}";
+
+        return $this->success(["channel_name" => $channel_name ]);
     }
 
 }

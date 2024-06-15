@@ -69,6 +69,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/start/videochat', [VideoStreamController::class, 'start_video_chat']);
 
         Route::put("/leave/videochat", [VideoStreamController::class, 'leave_video_chat']);
+
+        Route::put('/video/stream', [VideoStreamController::class, 'video_stream']);
     });
 });
 
