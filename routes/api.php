@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\DI\AuthDI;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\VideoStreamController;
+use App\Http\Controllers\WebRTCController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -74,6 +75,12 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
+// web-rtc routes
+Route::post('/create-room', [WebRTCController::class, 'createRoom']);
+Route::post('/join-room', [WebRTCController::class, 'joinRoom']);
+Route::post('/add-ice-candidate', [WebRTCController::class, 'addIceCandidate']);
+Route::get('/get-ice-candidates/{roomId}/{role}', [WebRTCController::class, 'getIceCandidates']);
+Route::post('/candidat-data-handler', [WebRTCController::class, 'candidat_data_handler']);
 
 // test_for
 Route::get('/test_message', [ChatController::class, 'test_message']);
