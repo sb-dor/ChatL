@@ -56,6 +56,15 @@ class WebRTCController extends Controller
                 $room->save();
 
                 $offer = json_decode($room->offer, true);
+                $answer = json_decode($room->answer, true);
+
+                broadcast(
+                    new WebRTCEvent(
+                        [
+                            'answer' => $answer,
+                        ],
+                    )
+                );
 
                 return response()->json(['success' => true, 'offer' => $offer], 200);
             }
@@ -120,6 +129,7 @@ class WebRTCController extends Controller
         }
 
         $candidates = IceCandidate::where('room_id', $roomId)->where('role', $role)->get();
+
         return response()->json(['candidates' => $candidates], 200);
     }
 

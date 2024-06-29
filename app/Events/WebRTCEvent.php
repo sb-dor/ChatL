@@ -43,7 +43,5 @@ class WebRTCEvent implements ShouldBroadcastNow
     public function broadcastWith()
     {
         return $this->data;
-    }
-
-    
+    }    
 }
