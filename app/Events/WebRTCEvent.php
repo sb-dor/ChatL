@@ -32,12 +32,12 @@ class WebRTCEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return ['webrtc_test_channel_name']; // rename in the fututre
+        return ['webrtc_channel']; // rename in the fututre
     }
 
     public function broadcastAs()
     {
-        return 'webrtc_test_channel.event'; // name of event 
+        return 'webrtc_channel.event'; // name of event 
     }
 
     public function broadcastWith()

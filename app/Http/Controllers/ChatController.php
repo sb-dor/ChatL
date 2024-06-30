@@ -124,14 +124,14 @@ class ChatController extends Controller
                 Chat::where('id', $request->get('chat_id'))->update(['temporary_chat' => null]);
             }
 
-            event(new ChatMessageEvent($message, $chat->chat_uuid));
+            broadcast(new ChatMessageEvent($message, $chat->chat_uuid));
             $this->notify_all_users_channels_listener($chat, $request);
         } catch (Exception $e) {
             return $this->fail(['message' => $e->getMessage()]);
         }
     }
 
-    private function notify_all_users_channels_listener($chat, $request)
+    public function notify_all_users_channels_listener($chat, $request)
     {
         $chat = $chat->load('chat_last_message')->load([
             'participants' => function ($sql) use ($request) {
@@ -146,7 +146,7 @@ class ChatController extends Controller
             ->toArray();
 
         foreach ($find_all_chat_participants as $user_id) {
-            event(new ChatNotifyEvent($chat, $user_id));
+            broadcast(new ChatNotifyEvent($chat, $user_id));
         }
     }
 

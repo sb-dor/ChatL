@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChatNotifyEvent;
 use App\Events\VideoStreamEvent;
 use App\Models\Chat;
 use App\Models\ChatParticipant;
@@ -24,7 +25,7 @@ class VideoStreamController extends Controller
                 ->first();
 
             if (!$chat) {
-                //
+                // creation of chat here again if it's not exist
             }
 
             $chat->update([
@@ -48,6 +49,10 @@ class VideoStreamController extends Controller
                     'participate_at' => date('Y-m-d H:i:s'),
                 ]);
             }
+
+            $chat_controller = new ChatController();
+
+            $chat_controller->notify_all_users_channels_listener($chat, $request);
 
             return $this->success();
 
@@ -88,6 +93,10 @@ class VideoStreamController extends Controller
         ])
             ->update(['in_video_stream' => null]);
 
+        $chat_controller = new ChatController();
+
+        $chat_controller->notify_all_users_channels_listener($chat, $request);
+
         return $this->success();
     }
 
@@ -123,7 +132,7 @@ class VideoStreamController extends Controller
 
         $channel_name = "video_" . CHAT_CHANNEL_ID . "{$chat->id}" . CHAT_CHANNEL_UUID . "{$chat->chat_uuid}";
 
-        return $this->success(["channel_name" => $channel_name ]);
+        return $this->success(["channel_name" => $channel_name]);
     }
 
 }
