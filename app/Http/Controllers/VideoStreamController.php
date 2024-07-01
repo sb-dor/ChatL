@@ -50,9 +50,6 @@ class VideoStreamController extends Controller
                 ]);
             }
 
-            $chat_controller = new ChatController();
-
-            $chat_controller->notify_all_users_channels_listener($chat, $request);
 
             return $this->success();
 

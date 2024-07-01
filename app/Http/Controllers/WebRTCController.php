@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\WebRTCEvent;
+use App\Models\Chat;
 use App\Models\IceCandidate;
 use App\Models\Room;
 use Illuminate\Http\Request;
@@ -25,7 +26,14 @@ class WebRTCController extends Controller
 
         $room = new Room();
         $room->offer = json_encode($offer);
+        $room->chat_id = $request->get('chat_id');
         $room->save();
+
+        $chat = Chat::where('id', $request->get('chat_id'))->first();
+
+        $chat_controller = new ChatController();
+
+        $chat_controller->notify_all_users_channels_listener($chat, $request);
 
         return response()->json(['roomId' => $room->id], 201);
     }

@@ -29,4 +29,9 @@ class Chat extends Model
     {
         return $this->hasMany(ChatMessage::class, 'chat_id', 'id');
     }
+
+    public function chat_video_room()
+    {
+        return $this->hasOne(Room::class, 'chat_id', 'id');
+    }
 }

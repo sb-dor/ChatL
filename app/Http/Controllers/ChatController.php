@@ -88,16 +88,18 @@ class ChatController extends Controller
                 }
             }
 
-            $findChat = $findChat->load(['participants' => function ($sql) use($current_user) {
-                $sql->with('user')->where('user_id', '!=', $current_user->id);
-            }])->load([
-                'messages' => function ($sql) {
-                    $sql->with('user', 'related_to_user')
-                        ->whereNull('deleted_at')
-                        ->orderBy('created_at', 'desc')
-                        ->take(15);
+            $findChat = $findChat->load([
+                'participants' => function ($sql) use ($current_user) {
+                    $sql->with('user')->where('user_id', '!=', $current_user->id);
                 }
-            ]);
+            ])->load([
+                        'messages' => function ($sql) {
+                            $sql->with('user', 'related_to_user')
+                                ->whereNull('deleted_at')
+                                ->orderBy('created_at', 'desc')
+                                ->take(15);
+                        }
+                    ]);
 
             return $this->success(['chat' => $findChat]);
         } catch (Exception $e) {
@@ -133,11 +135,20 @@ class ChatController extends Controller
 
     public function notify_all_users_channels_listener($chat, $request)
     {
-        $chat = $chat->load('chat_last_message')->load([
-            'participants' => function ($sql) use ($request) {
+        $chat = $chat->load([
+            'chat_last_message',
+            'participants' => function ($sql) {
                 $sql->with('user');
-            }
+            },
         ]);
+
+        if ($chat->video_chat_streaming) {
+            $chat->load([
+                'chat_video_room' => function ($sql) {
+                    $sql->orderBy('created_at', 'desc');
+                }
+            ]);
+        }
 
         $find_all_chat_participants = ChatParticipant
             ::where('chat_id', $chat->id)
