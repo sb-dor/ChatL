@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChatMessageEvent;
 use App\Events\WebRTCEvent;
 use App\Models\Chat;
 use App\Models\IceCandidate;
@@ -29,9 +30,21 @@ class WebRTCController extends Controller
         $room->chat_id = $request->get('chat_id');
         $room->save();
 
-        $chat = Chat::where('id', $request->get('chat_id'))->first();
+        $chat = Chat::where('id', $request->get('chat_id'))->with(
+            [
+                'chat_video_room' => function ($sql) {
+                    $sql->orderBy('created_at', 'desc');
+                },
+                'chat_last_message',
+                'participants' => function ($sql) {
+                    $sql->with('user');
+                },
+            ]
+        )->first();
 
         $chat_controller = new ChatController();
+
+        broadcast(new ChatMessageEvent(null, $chat, true));
 
         $chat_controller->notify_all_users_channels_listener($chat, $request);
 

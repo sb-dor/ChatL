@@ -88,18 +88,22 @@ class ChatController extends Controller
                 }
             }
 
-            $findChat = $findChat->load([
-                'participants' => function ($sql) use ($current_user) {
-                    $sql->with('user')->where('user_id', '!=', $current_user->id);
-                }
-            ])->load([
-                        'messages' => function ($sql) {
-                            $sql->with('user', 'related_to_user')
-                                ->whereNull('deleted_at')
-                                ->orderBy('created_at', 'desc')
-                                ->take(15);
-                        }
-                    ]);
+            $findChat = $findChat->load(
+                [
+                    'participants' => function ($sql) use ($current_user) {
+                        $sql->with('user')->where('user_id', '!=', $current_user->id);
+                    },
+                    'messages' => function ($sql) {
+                        $sql->with('user', 'related_to_user')
+                            ->whereNull('deleted_at')
+                            ->orderBy('created_at', 'desc')
+                            ->take(15);
+                    },
+                    'chat_video_room' => function ($sql) {
+                        $sql->orderBy('created_at', 'desc');
+                    },
+                ]
+            );
 
             return $this->success(['chat' => $findChat]);
         } catch (Exception $e) {
@@ -126,7 +130,7 @@ class ChatController extends Controller
                 Chat::where('id', $request->get('chat_id'))->update(['temporary_chat' => null]);
             }
 
-            broadcast(new ChatMessageEvent($message, $chat->chat_uuid));
+            broadcast(new ChatMessageEvent($message, $chat));
             $this->notify_all_users_channels_listener($chat, $request);
         } catch (Exception $e) {
             return $this->fail(['message' => $e->getMessage()]);

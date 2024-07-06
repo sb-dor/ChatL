@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Chat;
 use App\Models\ChatMessage;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -16,10 +17,8 @@ class ChatMessageEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-
-
-    private ChatMessage $message;
     private $CHANNEL_NAME;
+    private $sendingMessage = null;
 
 
     /**
@@ -27,10 +26,17 @@ class ChatMessageEvent implements ShouldBroadcastNow
      *
      * @return void
      */
-    public function __construct($message, $chat_uuid)
+    public function __construct($message, $chat, $init_chat = false)
     {
-        $this->message = $message;
-        $this->CHANNEL_NAME = CHAT_CHANNEL_ID . "{$message->chat_id}" . CHAT_CHANNEL_UUID . "{$chat_uuid}";
+        $this->CHANNEL_NAME = CHAT_CHANNEL_ID . "{$chat->id}" . CHAT_CHANNEL_UUID . "{$chat->chat_uuid}";
+
+        $this->sendingMessage = [
+            'message' => $message,
+        ];
+
+        if ($init_chat) {
+            $this->sendingMessage['chat'] = $chat;
+        }
     }
 
     /**
@@ -50,8 +56,6 @@ class ChatMessageEvent implements ShouldBroadcastNow
 
     public function broadcastWith()
     {
-        return  [
-            'message' =>$this->message,
-        ]; //after working any fun that calling this event will send message reverse
+        return $this->sendingMessage;// after working any fun that calling this event will send message reverse
     }
 }

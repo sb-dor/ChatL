@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChatMessageEvent;
 use App\Events\ChatNotifyEvent;
 use App\Events\VideoStreamEvent;
 use App\Models\Chat;
@@ -91,6 +92,8 @@ class VideoStreamController extends Controller
             ->update(['in_video_stream' => null]);
 
         $chat_controller = new ChatController();
+
+        broadcast(new ChatMessageEvent(null, $chat, true));
 
         $chat_controller->notify_all_users_channels_listener($chat, $request);
 
