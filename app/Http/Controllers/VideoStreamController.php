@@ -7,6 +7,8 @@ use App\Events\ChatNotifyEvent;
 use App\Events\VideoStreamEvent;
 use App\Models\Chat;
 use App\Models\ChatParticipant;
+use App\Models\IceCandidate;
+use App\Models\Room;
 use App\Traits\ResponsesTrait;
 use Exception;
 use Illuminate\Http\Request;
@@ -28,6 +30,12 @@ class VideoStreamController extends Controller
             if (!$chat) {
                 // creation of chat here again if it's not exist
             }
+
+            $all_chats_rooms = Room::where('chat_id', $chat->id)->whereNull('answer')->pluck('id');
+
+            IceCandidate::whereIn('room_id', $all_chats_rooms)->delete();
+
+            Room::whereIn('id', $all_chats_rooms)->delete();
 
             $chat->update([
                 'video_chat_streaming' => true,
@@ -80,6 +88,12 @@ class VideoStreamController extends Controller
         if (!$chat) {
             return $this->success();
         }
+
+        $all_chats_rooms = Room::where('chat_id', $chat->id)->whereNull('answer')->pluck('id');
+
+        IceCandidate::whereIn('room_id', $all_chats_rooms)->delete();
+
+        Room::whereIn('id', $all_chats_rooms)->delete();
 
         $chat->update([
             'video_chat_streaming' => null,

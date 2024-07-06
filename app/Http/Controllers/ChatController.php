@@ -100,7 +100,8 @@ class ChatController extends Controller
                             ->take(15);
                     },
                     'chat_video_room' => function ($sql) {
-                        $sql->orderBy('created_at', 'desc');
+                        $sql->whereNull('answer')
+                            ->orderBy('created_at', 'desc');
                     },
                 ]
             );
