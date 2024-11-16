@@ -252,4 +252,22 @@ class ChatController extends Controller
 
         // return response()->json(['data' => $usersChatsIds]);
     }
+
+    public function post_images(Request $request)
+    {
+        if($request->file('name_of_the_file')){
+            return response()->json([
+                'data' => [
+                    'image_is_coming' => true,
+                    'field_is_coming_too' => $request->get('flutter_version')
+                ],
+            ]);
+        }
+        return response()->json([
+            'data' => [
+                'image_is_coming' => false,
+                'field_is_coming_too' => $request->get('flutter_version')
+            ],
+        ]);
+    }
 }

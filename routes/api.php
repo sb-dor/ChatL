@@ -84,3 +84,4 @@ Route::post('/candidat-data-handler', [WebRTCController::class, 'candidat_data_h
 
 // test_for
 Route::get('/test_message', [ChatController::class, 'test_message']);
+Route::post('/post/images/test', [ChatController::class, 'post_images']);
