@@ -72,7 +72,8 @@ class VideoStreamController extends Controller
     public function videochat_entrance(Request $request)
     {
         // first check whether video chat is already finished
-        // if it's finished send to user a response with a message "video chat is over" 
+        // if it's finished send to user a response with a message "video chat is over"
+        return response()->json(['success' => true]);
     }
 
     public function leave_video_chat(Request $request)
