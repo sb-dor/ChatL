@@ -22,8 +22,6 @@ use Illuminate\Support\Facades\Route;
 // AUTH ROUTES
 Route::prefix('/auth')->group(function () {
 
-    Route::get('/check-auth', [AuthDI::class, 'check_auth']);
-
     Route::post('/register', [AuthDI::class, 'register']);
 
     Route::post('/login', [AuthDI::class, 'login']);
@@ -33,6 +31,7 @@ Route::prefix('/auth')->group(function () {
     Route::post('/facebook-auth', [AuthDI::class, 'facebook_auth']);
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/check-auth', [AuthDI::class, 'check_auth']);
         Route::delete('/logout', [AuthDI::class, 'logout']);
     });
 });
