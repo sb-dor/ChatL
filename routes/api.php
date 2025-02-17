@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\DI\AuthDI;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactsController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VideoStreamController;
 use App\Http\Controllers\WebRTCController;
 use Illuminate\Support\Facades\Route;
@@ -71,6 +72,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put("/leave/videochat", [VideoStreamController::class, 'leave_video_chat']);
 
         Route::put('/video/stream', [VideoStreamController::class, 'video_stream']);
+    });
+
+
+    // PROFILE API
+    Route::prefix('/profile')->group(function () {
+
+        Route::get('/about/{id}', [ProfileController::class, '']);
     });
 });
 
