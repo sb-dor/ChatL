@@ -1,47 +1,36 @@
 "A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
-scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+scalar DateTime
+    @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 
 "Indicates what fields are available at the top level of a query operation."
 type Query {
     "Find a single user by an identifying attribute."
     user(
-      "Search by primary key."
-      id: ID @eq @rules(apply: ["prohibits:email", "required_without:email"])
+        "Search by primary key."
+        id: ID @eq @rules(apply: ["prohibits:email", "required_without:email"])
 
-      "Search by email address."
-      email: String @eq @rules(apply: ["prohibits:id", "required_without:id", "email"])
+        "Search by email address."
+        email: String
+            @eq
+            @rules(apply: ["prohibits:id", "required_without:id", "email"])
     ): User @find
 
     "List multiple users."
-     users: [User!]! @paginate
+    users: [User!]! @paginate
 }
 
 "Account of a person who uses this application."
 type User {
-    "Unique primary key."
     id: ID!
-
-    "Non-unique name."
     name: String
-
-    "Unique email address."
     email: String
-
-    "When the email was verified."
     email_verified_at: DateTime
-
-    "When the account was created."
     created_at: DateTime!
-
-    "When the account was last updated."
     updated_at: DateTime
-
-    role_ob: Role! @belongsTo(relation: "role_ob")
+    role: Role @belongsTo(relation: "role")
 }
 
 type Role {
-  id: ID!
-  role: String!
-  created_at: DateTime!
-  updated_at: DateTime!
+    id: ID!
+    role: String
 }

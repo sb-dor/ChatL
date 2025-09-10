@@ -52,7 +52,7 @@ class User extends Authenticatable
         return $this->hasOne(UserContact::class, 'contact_id', 'id');
     }
 
-    public function role_ob()
+    public function role()
     {
         return $this->belongsTo(Role::class, 'role_id', 'id');
     }
