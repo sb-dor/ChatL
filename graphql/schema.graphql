@@ -18,6 +18,23 @@ type Query {
     roles: [Role!]! @paginate
 }
 
+type Mutation {
+  "Create a new user."
+  createUser(name: String!, email: String, auction_enabled: Int!): User @create
+
+  "Update an existing user."
+  updateUser(
+    id: ID!
+    name: String
+    email: String
+    role_id: ID
+    email_verified_at: DateTime
+  ): User @update
+
+  "Delete a user."
+  deleteUser(id: ID!): User @delete
+}
+
 "Account of a person who uses this application."
 type User {
     id: ID!
@@ -26,6 +43,7 @@ type User {
     email_verified_at: DateTime
     created_at: DateTime!
     updated_at: DateTime
+    auction_enabled: Int!,
     role: Role @belongsTo(relation: "role")
 }
 
