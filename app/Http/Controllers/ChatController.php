@@ -12,6 +12,7 @@ use App\Traits\ResponsesTrait;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use function PHPUnit\Framework\stringContains;
 
 class ChatController extends Controller
 {
@@ -20,7 +21,6 @@ class ChatController extends Controller
 
     public function get_all_users_chat(Request $request)
     {
-
         try {
             $user = $request->user();
 
